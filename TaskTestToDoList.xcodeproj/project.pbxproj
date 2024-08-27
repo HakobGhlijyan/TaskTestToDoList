@@ -60,7 +60,6 @@
 			isa = PBXGroup;
 			children = (
 				344009942C7DC9CC00A4F139 /* TaskTestToDoListApp.swift */,
-				344009962C7DC9CC00A4F139 /* ToDoListView.swift */,
 				344009A72C7DCC3E00A4F139 /* Extension */,
 				344009A22C7DCBD800A4F139 /* Model */,
 				344009A32C7DCBE000A4F139 /* ViewModel */,
@@ -97,6 +96,7 @@
 		344009A42C7DCBF900A4F139 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				344009962C7DC9CC00A4F139 /* ToDoListView.swift */,
 				344009AA2C7DCCBE00A4F139 /* NewTaskView.swift */,
 				344009AC2C7DCD0B00A4F139 /* EditTaskView.swift */,
 			);

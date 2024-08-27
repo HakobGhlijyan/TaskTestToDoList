@@ -6,14 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
-// Представление для добавления новой задачи
 struct NewTaskView: View {
+    @Environment(\.modelContext) private var modelContext // Доступ к контексту SwiftData
     @Environment(\.presentationMode) var presentationMode
-    @Binding var todoItems: [ToDoItem]
 
     @State private var title: String = ""
-    @State private var description: String = ""
     @State private var isCompleted: Bool = false
 
     var body: some View {
@@ -21,10 +20,6 @@ struct NewTaskView: View {
             Form {
                 Section(header: Text("Название")) {
                     TextField("Введите название", text: $title)
-                }
-
-                Section(header: Text("Описание")) {
-                    TextField("Введите описание", text: $description)
                 }
 
                 Section {
@@ -45,13 +40,8 @@ struct NewTaskView: View {
 
     // Функция добавления новой задачи
     func addNewTask() {
-        let newTask = ToDoItem(
-            title: title,
-            description: description,
-            dateCreated: Date(),
-            isCompleted: isCompleted
-        )
-        todoItems.append(newTask)
+        let newTask = ToDoItem(title: title, isCompleted: isCompleted)
+        modelContext.insert(newTask) // Вставка новой задачи в контекст
     }
 }
 

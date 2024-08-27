@@ -6,22 +6,19 @@
 //
 
 import SwiftUI
+import SwiftData
 
-// Представление для редактирования существующей задачи
 struct EditTaskView: View {
+    @Environment(\.modelContext) private var modelContext // Доступ к контексту SwiftData
     @Environment(\.presentationMode) var presentationMode
-    @Binding var todoItems: [ToDoItem]
-    
     var task: ToDoItem
+
     @State private var title: String
-    @State private var description: String
     @State private var isCompleted: Bool
 
-    init(todoItems: Binding<[ToDoItem]>, task: ToDoItem) {
-        self._todoItems = todoItems
+    init(task: ToDoItem) {
         self.task = task
         self._title = State(initialValue: task.title)
-        self._description = State(initialValue: task.description)
         self._isCompleted = State(initialValue: task.isCompleted)
     }
 
@@ -30,10 +27,6 @@ struct EditTaskView: View {
             Form {
                 Section(header: Text("Название")) {
                     TextField("Введите название", text: $title)
-                }
-
-                Section(header: Text("Описание")) {
-                    TextField("Введите описание", text: $description)
                 }
 
                 Section {
@@ -54,11 +47,9 @@ struct EditTaskView: View {
 
     // Функция сохранения изменений задачи
     func saveChanges() {
-        if let index = todoItems.firstIndex(where: { $0.id == task.id }) {
-            todoItems[index].title = title
-            todoItems[index].description = description
-            todoItems[index].isCompleted = isCompleted
-        }
+        // Изменения автоматически отслеживаются в контексте
+        task.title = title
+        task.isCompleted = isCompleted
     }
 }
 
