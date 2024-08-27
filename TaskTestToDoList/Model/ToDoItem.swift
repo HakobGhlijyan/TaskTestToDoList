@@ -5,12 +5,12 @@
 //  Created by Hakob Ghlijyan on 27.08.2024.
 //
 
-import SwiftData
 import SwiftUI
+import SwiftData
 
 @Model
 final class ToDoItem {
-    @Attribute(.unique) var id: UUID
+    var id: UUID
     var title: String
     var dateCreated: Date
     var isCompleted: Bool

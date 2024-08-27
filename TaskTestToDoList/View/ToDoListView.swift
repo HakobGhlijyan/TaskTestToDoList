@@ -56,20 +56,48 @@ struct ToDoListView: View {
             .sheet(item: $editingTask) { task in
                 EditTaskView(task: task)
             }
+            .onAppear {
+                loadInitialData()
+            }
+        }
+    }
+
+    func loadInitialData() {
+        loadTodosFromAPI { result in
+            switch result {
+            case .success(let todos):
+                DispatchQueue.main.async {
+                    saveTodos(todos)
+                }
+            case .failure(let error):
+                print("Ошибка при загрузке данных: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func saveTodos(_ todos: [TodoItemDTO]) {
+        for todo in todos {
+            let newTask = ToDoItem(title: todo.todo, isCompleted: todo.completed)
+            modelContext.insert(newTask)
+        }
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка при сохранении задач: \(error.localizedDescription)")
         }
     }
 
     func deleteTask(at offsets: IndexSet) {
         for index in offsets {
             let task = todoItems[index]
-            modelContext.delete(task) // Удаление задачи из контекста
+            modelContext.delete(task)
         }
         saveChanges()
     }
 
     func saveChanges() {
         do {
-            try modelContext.save() // Сохранение изменений
+            try modelContext.save()
         } catch {
             print("Ошибка при удалении задач: \(error.localizedDescription)")
         }

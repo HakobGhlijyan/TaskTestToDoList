@@ -40,13 +40,13 @@ struct NewTaskView: View {
 
     func addNewTask() {
         let newTask = ToDoItem(title: title, isCompleted: isCompleted)
-        modelContext.insert(newTask) // Вставка новой задачи в контекст
+        modelContext.insert(newTask)
         saveChanges()
     }
 
     func saveChanges() {
         do {
-            try modelContext.save() // Сохранение изменений
+            try modelContext.save()
         } catch {
             print("Ошибка при добавлении задачи: \(error.localizedDescription)")
         }

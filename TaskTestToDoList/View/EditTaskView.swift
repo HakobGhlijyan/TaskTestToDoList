@@ -48,7 +48,6 @@ struct EditTaskView: View {
     func saveChanges() {
         task.title = title
         task.isCompleted = isCompleted
-        // Сохранение изменений после редактирования
         do {
             try modelContext.save()
         } catch {
