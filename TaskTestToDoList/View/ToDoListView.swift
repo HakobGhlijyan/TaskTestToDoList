@@ -10,13 +10,11 @@ import Combine
 
 struct ToDoListView: View {
     @Environment(\.modelContext) private var modelContext
-    
-    @Query private var todoItems: [ToDoItem]
     @Query(
         sort: \ToDoItem.dateCreated,
         order: .reverse,
         animation: .bouncy
-    ) private var todoItemsSortedDate: [ToDoItem]
+    ) private var todoItems: [ToDoItem]
     @Query(
         filter: #Predicate<ToDoItem> { !$0.isCompleted },
         sort: \ToDoItem.dateCreated, 
@@ -41,66 +39,8 @@ struct ToDoListView: View {
                     ProgressView("Загрузка задач...") // Индикатор загрузки
                 } else {
                     List {
-                        Section {
-                            if showingSection1 {
-                                ForEach(todoItemsSortedDate) { item in
-                                    HStack {
-                                        VStack(alignment: .leading) {
-                                            Text(item.title)
-                                                .font(.headline)
-                                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
-                                                .font(.footnote)
-                                                .foregroundColor(.gray)
-                                        }
-                                        Spacer()
-                                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(item.isCompleted ? .green : .red)
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        editingTask = item
-                                    }
-                                }
-                                .onDelete(perform: deleteTask)
-                            }
-                        } header: {
-                            SectionHeader(
-                                title: "All",
-                                isOn: $showingSection1,
-                                onLabel: "Hide",
-                                offLabel: "Show"
-                            )
-                        }
-                        Section {
-                            if showingSection2 {
-                                ForEach(todoItemsInProgress) { item in
-                                    HStack {
-                                        VStack(alignment: .leading) {
-                                            Text(item.title)
-                                                .font(.headline)
-                                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
-                                                .font(.footnote)
-                                                .foregroundColor(.gray)
-                                        }
-                                        Spacer()
-                                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                            .foregroundColor(item.isCompleted ? .green : .red)
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onTapGesture {
-                                        editingTask = item
-                                    }
-                                }
-                                .onDelete(perform: deleteTask)
-                            }
-                        } header: {
-                            SectionHeader(
-                                title: "In Progress",
-                                isOn: $showingSection2,
-                                onLabel: "Hide",
-                                offLabel: "Show"
-                            )
-                        }
+                        allToDoSection
+                        inProgressSectionLayer
                     }
                 }
             }
@@ -135,7 +75,82 @@ struct ToDoListView: View {
             }
         }
     }
+}
+
+
+#Preview {
+    ToDoListView()
+}
+
+extension ToDoListView {
+    private var allToDoSection: some View {
+        Section {
+            if showingSection1 {
+                ForEach(todoItems) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.title)
+                                .font(.headline)
+                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(item.isCompleted ? .green : .red)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        editingTask = item
+                    }
+                }
+                .onDelete(perform: deleteTask)
+            }
+        } header: {
+            SectionHeader(
+                title: "All",
+                isOn: $showingSection1,
+                onLabel: "Hide",
+                offLabel: "Show"
+            )
+        }
+    }
     
+    private var inProgressSectionLayer: some View {
+        Section {
+            if showingSection2 {
+                ForEach(todoItemsInProgress) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.title)
+                                .font(.headline)
+                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                            .foregroundColor(item.isCompleted ? .green : .red)
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        editingTask = item
+                    }
+                }
+            }
+        } header: {
+            SectionHeader(
+                title: "In Progress",
+                isOn: $showingSection2,
+                onLabel: "Hide",
+                offLabel: "Show"
+            )
+        }
+    }
+}
+
+//Func
+extension ToDoListView {
     //Use async
     func loadDataAsync() async {
         do {
@@ -207,9 +222,4 @@ struct ToDoListView: View {
             print("Error delete data: \(error.localizedDescription)")
         }
     }
-}
-
-
-#Preview {
-    ToDoListView()
 }

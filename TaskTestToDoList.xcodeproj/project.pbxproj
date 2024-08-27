@@ -66,7 +66,6 @@
 				344009942C7DC9CC00A4F139 /* TaskTestToDoListApp.swift */,
 				344009A72C7DCC3E00A4F139 /* Extension */,
 				344009A22C7DCBD800A4F139 /* Model */,
-				344009A32C7DCBE000A4F139 /* ViewModel */,
 				344009A42C7DCBF900A4F139 /* View */,
 				344009982C7DC9CD00A4F139 /* Assets.xcassets */,
 				3440099A2C7DC9CD00A4F139 /* Preview Content */,
@@ -89,13 +88,6 @@
 				344009B02C7DE26800A4F139 /* Todo.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		344009A32C7DCBE000A4F139 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		344009A42C7DCBF900A4F139 /* View */ = {
