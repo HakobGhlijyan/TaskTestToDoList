@@ -66,10 +66,7 @@
 			isa = PBXGroup;
 			children = (
 				344009942C7DC9CC00A4F139 /* TaskTestToDoListApp.swift */,
-				344009A72C7DCC3E00A4F139 /* Extension */,
-				3498CF032C7E1AF600E2B6B1 /* ViewModel */,
-				344009A22C7DCBD800A4F139 /* Model */,
-				344009A42C7DCBF900A4F139 /* View */,
+				3498CF0A2C7E1FBE00E2B6B1 /* MVVM */,
 				344009982C7DC9CD00A4F139 /* Assets.xcassets */,
 				3440099A2C7DC9CD00A4F139 /* Preview Content */,
 			);
@@ -96,10 +93,9 @@
 		344009A42C7DCBF900A4F139 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				344009962C7DC9CC00A4F139 /* ToDoListView.swift */,
-				344009AA2C7DCCBE00A4F139 /* NewTaskView.swift */,
-				344009AC2C7DCD0B00A4F139 /* EditTaskView.swift */,
-				3498CEFF2C7E10F600E2B6B1 /* SectionHeader.swift */,
+				3498CF102C7E224400E2B6B1 /* Components */,
+				3498CF0F2C7E223B00E2B6B1 /* Secondary */,
+				3498CF0E2C7E222C00E2B6B1 /* MainView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -118,6 +114,42 @@
 				3498CF042C7E1B0500E2B6B1 /* ToDoListViewModel.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		3498CF0A2C7E1FBE00E2B6B1 /* MVVM */ = {
+			isa = PBXGroup;
+			children = (
+				344009A72C7DCC3E00A4F139 /* Extension */,
+				3498CF032C7E1AF600E2B6B1 /* ViewModel */,
+				344009A22C7DCBD800A4F139 /* Model */,
+				344009A42C7DCBF900A4F139 /* View */,
+			);
+			path = MVVM;
+			sourceTree = "<group>";
+		};
+		3498CF0E2C7E222C00E2B6B1 /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				344009962C7DC9CC00A4F139 /* ToDoListView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		3498CF0F2C7E223B00E2B6B1 /* Secondary */ = {
+			isa = PBXGroup;
+			children = (
+				344009AC2C7DCD0B00A4F139 /* EditTaskView.swift */,
+				344009AA2C7DCCBE00A4F139 /* NewTaskView.swift */,
+			);
+			path = Secondary;
+			sourceTree = "<group>";
+		};
+		3498CF102C7E224400E2B6B1 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				3498CEFF2C7E10F600E2B6B1 /* SectionHeader.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
