@@ -58,6 +58,8 @@ struct ToDoListView: View {
                 EditTaskView(task: task)
             }
             .onAppear {
+                vm.setup(context: modelContext)
+                
                 if !dataLoaded {
                     Task {
                         await vm.loadDataAsync()
@@ -70,6 +72,7 @@ struct ToDoListView: View {
         }
     }
 }
+
 
 #Preview {
     ToDoListView()

@@ -11,7 +11,11 @@ import Combine
 
 @MainActor
 final class ToDoListViewModel: ObservableObject {
-    @Environment(\.modelContext) private var modelContext
+    private var modelContext: ModelContext?
+        
+    func setup(context: ModelContext) {
+        self.modelContext = context
+    }
     
     @Published var isPresentingNewTaskView = false
     @Published var editingTask: ToDoItem?
@@ -65,12 +69,18 @@ final class ToDoListViewModel: ObservableObject {
 
     //All func
     func saveTodos(_ todos: [TodoItemDTO]) {
+        guard let context = modelContext else {
+            print("ModelContext is not available")
+            return
+        }
+        
         for todo in todos {
             let newTask = ToDoItem(title: todo.todo, isCompleted: todo.completed)
-            modelContext.insert(newTask)
+            context.insert(newTask)
         }
+        
         do {
-            try modelContext.save()
+            try context.save()
             print("Save Todos Data")
         } catch {
             print("Error save data: \(error.localizedDescription)")
@@ -78,8 +88,12 @@ final class ToDoListViewModel: ObservableObject {
     }
 
     func saveChanges() {
+        guard let context = modelContext else {
+            print("ModelContext is not available")
+            return
+        }
         do {
-            try modelContext.save()
+            try context.save()
             print("Save Todos Change")
         } catch {
             print("Error delete data: \(error.localizedDescription)")
