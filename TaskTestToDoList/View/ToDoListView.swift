@@ -4,7 +4,6 @@
 //
 //  Created by Hakob Ghlijyan on 27.08.2024.
 //
-
 import SwiftUI
 import SwiftData
 
@@ -39,11 +38,18 @@ struct ToDoListView: View {
                 .onDelete(perform: deleteTask)
             }
             .navigationTitle("ToDo List")
-            .navigationBarItems(trailing: Button(action: {
-                isPresentingNewTaskView = true
-            }) {
-                Image(systemName: "plus")
-            })
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        isPresentingNewTaskView = true
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    EditButton()
+                }
+            }
             .sheet(isPresented: $isPresentingNewTaskView) {
                 NewTaskView()
             }
@@ -57,6 +63,15 @@ struct ToDoListView: View {
         for index in offsets {
             let task = todoItems[index]
             modelContext.delete(task) // Удаление задачи из контекста
+        }
+        saveChanges()
+    }
+
+    func saveChanges() {
+        do {
+            try modelContext.save() // Сохранение изменений
+        } catch {
+            print("Ошибка при удалении задач: \(error.localizedDescription)")
         }
     }
 }

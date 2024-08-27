@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct NewTaskView: View {
-    @Environment(\.modelContext) private var modelContext // Доступ к контексту SwiftData
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.presentationMode) var presentationMode
 
     @State private var title: String = ""
@@ -38,10 +38,18 @@ struct NewTaskView: View {
         }
     }
 
-    // Функция добавления новой задачи
     func addNewTask() {
         let newTask = ToDoItem(title: title, isCompleted: isCompleted)
         modelContext.insert(newTask) // Вставка новой задачи в контекст
+        saveChanges()
+    }
+
+    func saveChanges() {
+        do {
+            try modelContext.save() // Сохранение изменений
+        } catch {
+            print("Ошибка при добавлении задачи: \(error.localizedDescription)")
+        }
     }
 }
 

@@ -10,7 +10,7 @@ import SwiftUI
 
 @Model
 final class ToDoItem {
-    var id: UUID
+    @Attribute(.unique) var id: UUID
     var title: String
     var dateCreated: Date
     var isCompleted: Bool
@@ -22,3 +22,4 @@ final class ToDoItem {
         self.isCompleted = isCompleted
     }
 }
+

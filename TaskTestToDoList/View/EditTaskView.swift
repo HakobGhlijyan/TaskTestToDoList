@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct EditTaskView: View {
-    @Environment(\.modelContext) private var modelContext // Доступ к контексту SwiftData
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.presentationMode) var presentationMode
     var task: ToDoItem
 
@@ -45,11 +45,15 @@ struct EditTaskView: View {
         }
     }
 
-    // Функция сохранения изменений задачи
     func saveChanges() {
-        // Изменения автоматически отслеживаются в контексте
         task.title = title
         task.isCompleted = isCompleted
+        // Сохранение изменений после редактирования
+        do {
+            try modelContext.save()
+        } catch {
+            print("Ошибка при сохранении изменений: \(error.localizedDescription)")
+        }
     }
 }
 
