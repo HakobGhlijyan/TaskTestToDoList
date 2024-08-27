@@ -6,36 +6,103 @@
 //
 import SwiftUI
 import SwiftData
+import Combine
 
 struct ToDoListView: View {
     @Environment(\.modelContext) private var modelContext
+    
     @Query private var todoItems: [ToDoItem]
+    @Query(
+        sort: \ToDoItem.dateCreated,
+        order: .reverse,
+        animation: .bouncy
+    ) private var todoItemsSortedDate: [ToDoItem]
+    @Query(
+        filter: #Predicate<ToDoItem> { !$0.isCompleted },
+        sort: \ToDoItem.dateCreated, 
+        order: .reverse,
+        animation: .bouncy
+    ) private var todoItemsInProgress: [ToDoItem]
+
 
     @State private var isPresentingNewTaskView = false
     @State private var editingTask: ToDoItem?
-
+    
+    @AppStorage("dataLoaded") private var dataLoaded = false
+    @State private var cancellables: Set<AnyCancellable> = []
+    
+    @State private var showingSection1 = true
+    @State private var showingSection2 = true
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(todoItems) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.title)
-                                .font(.headline)
-                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
-                                .font(.footnote)
-                                .foregroundColor(.gray)
+            ZStack {
+                if !dataLoaded {
+                    ProgressView("Загрузка задач...") // Индикатор загрузки
+                } else {
+                    List {
+                        Section {
+                            if showingSection1 {
+                                ForEach(todoItemsSortedDate) { item in
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(item.title)
+                                                .font(.headline)
+                                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
+                                                .font(.footnote)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(item.isCompleted ? .green : .red)
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        editingTask = item
+                                    }
+                                }
+                                .onDelete(perform: deleteTask)
+                            }
+                        } header: {
+                            SectionHeader(
+                                title: "All",
+                                isOn: $showingSection1,
+                                onLabel: "Hide",
+                                offLabel: "Show"
+                            )
                         }
-                        Spacer()
-                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .foregroundColor(item.isCompleted ? .green : .red)
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        editingTask = item
+                        Section {
+                            if showingSection2 {
+                                ForEach(todoItemsInProgress) { item in
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(item.title)
+                                                .font(.headline)
+                                            Text("Создана: \(item.dateCreated, formatter: itemFormatter)")
+                                                .font(.footnote)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(item.isCompleted ? .green : .red)
+                                    }
+                                    .contentShape(Rectangle())
+                                    .onTapGesture {
+                                        editingTask = item
+                                    }
+                                }
+                                .onDelete(perform: deleteTask)
+                            }
+                        } header: {
+                            SectionHeader(
+                                title: "In Progress",
+                                isOn: $showingSection2,
+                                onLabel: "Hide",
+                                offLabel: "Show"
+                            )
+                        }
                     }
                 }
-                .onDelete(perform: deleteTask)
             }
             .navigationTitle("ToDo List")
             .toolbar {
@@ -57,24 +124,59 @@ struct ToDoListView: View {
                 EditTaskView(task: task)
             }
             .onAppear {
-                loadInitialData()
+                if !dataLoaded {
+                    Task {
+                        await loadDataAsync()
+//                        loadDataCombine()
+//                        loadDataEscaping()
+                        dataLoaded = true
+                    }
+                }
             }
         }
     }
-
-    func loadInitialData() {
-        loadTodosFromAPI { result in
+    
+    //Use async
+    func loadDataAsync() async {
+        do {
+            let todos = try await loadTodosFromAsync()
+            saveTodos(todos)
+            print("Load Data for Async")
+        } catch {
+            print("Error download data: \(error.localizedDescription)")
+        }
+    }
+    
+    //Use combine
+    func loadDataCombine() {
+        loadTodosFromCombine()
+            .sink(receiveCompletion: { completion in
+                if case .failure(let error) = completion {
+                    print("Error download data: \(error.localizedDescription)")
+                }
+            }, receiveValue: { todos in
+                saveTodos(todos)
+                print("Load Data for Combine")
+            })
+            .store(in: &cancellables)
+    }
+    
+    //Use escaping
+    func loadDataEscaping() {
+        loadTodosFromEscaping { result in
             switch result {
             case .success(let todos):
                 DispatchQueue.main.async {
                     saveTodos(todos)
+                    print("Load Data for Escaping")
                 }
             case .failure(let error):
-                print("Ошибка при загрузке данных: \(error.localizedDescription)")
+                print("Error download data: \(error.localizedDescription)")
             }
         }
     }
 
+    //All func
     func saveTodos(_ todos: [TodoItemDTO]) {
         for todo in todos {
             let newTask = ToDoItem(title: todo.todo, isCompleted: todo.completed)
@@ -82,8 +184,9 @@ struct ToDoListView: View {
         }
         do {
             try modelContext.save()
+            print("Save Todos Data")
         } catch {
-            print("Ошибка при сохранении задач: \(error.localizedDescription)")
+            print("Error save data: \(error.localizedDescription)")
         }
     }
 
@@ -91,6 +194,7 @@ struct ToDoListView: View {
         for index in offsets {
             let task = todoItems[index]
             modelContext.delete(task)
+            print("Delete Data")
         }
         saveChanges()
     }
@@ -98,11 +202,13 @@ struct ToDoListView: View {
     func saveChanges() {
         do {
             try modelContext.save()
+            print("Save Todos Change")
         } catch {
-            print("Ошибка при удалении задач: \(error.localizedDescription)")
+            print("Error delete data: \(error.localizedDescription)")
         }
     }
 }
+
 
 #Preview {
     ToDoListView()

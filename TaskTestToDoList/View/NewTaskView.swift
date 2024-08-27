@@ -10,7 +10,7 @@ import SwiftData
 
 struct NewTaskView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
 
     @State private var title: String = ""
     @State private var isCompleted: Bool = false
@@ -30,10 +30,10 @@ struct NewTaskView: View {
             }
             .navigationTitle("Новая задача")
             .navigationBarItems(leading: Button("Отмена") {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }, trailing: Button("Сохранить") {
                 addNewTask()
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             })
         }
     }

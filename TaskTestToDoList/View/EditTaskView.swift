@@ -10,7 +10,7 @@ import SwiftData
 
 struct EditTaskView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     var task: ToDoItem
 
     @State private var title: String
@@ -37,10 +37,10 @@ struct EditTaskView: View {
             }
             .navigationTitle("Редактировать задачу")
             .navigationBarItems(leading: Button("Отмена") {
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             }, trailing: Button("Сохранить") {
                 saveChanges()
-                presentationMode.wrappedValue.dismiss()
+                dismiss()
             })
         }
     }
